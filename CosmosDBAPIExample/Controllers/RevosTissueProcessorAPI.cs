@@ -16,10 +16,12 @@ namespace CosmosDBAPIExample.Controllers
     public class RevosTissueProcessorAPI : Controller
     {
         private readonly ICosmosDBService _cosmosDBService;
+        private readonly ICosmosTableService _cosmosTableService;
 
-        public RevosTissueProcessorAPI(ICosmosDBService cosmosDBService)
+        public RevosTissueProcessorAPI(ICosmosDBService cosmosDBService, ICosmosTableService cosmosTableService)
         {
             _cosmosDBService = cosmosDBService;
+            _cosmosTableService = cosmosTableService;
         }
 
         [HttpGet]
@@ -35,6 +37,7 @@ namespace CosmosDBAPIExample.Controllers
                 " from c where c.deviceIdAndMessageType = @deviceParams ORDER BY c._ts DESC")
                 .WithParameter("@deviceParams", deviceParamValue);
 
+            ProvisionedDeviceMetadata deviceMetadata = await _cosmosTableService.InsertDeviceData(deviceId);
             return await _cosmosDBService.GetDeviceMetadata(queryDefinition);
         }
 

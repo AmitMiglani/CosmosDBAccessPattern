@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,6 +31,7 @@ namespace CosmosDBAPIExample
         {
             services.AddControllers();
             services.AddSingleton<ICosmosDBService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+            services.AddSingleton<ICosmosTableService>(InitializeCosmosTableClientInstanceAsync(Configuration.GetSection("CosmosTable")));
 
         }
 
@@ -57,6 +59,20 @@ namespace CosmosDBAPIExample
         /// Creates a Cosmos DB database and a container with the specified partition key. 
         /// </summary>
         /// <returns></returns>
+        private static CosmosTableService InitializeCosmosTableClientInstanceAsync(IConfigurationSection configurationSection)
+        {
+            string databaseConnectionString = configurationSection.GetSection("ConnectionString").Value;
+            string tableName =  configurationSection.GetSection("TableName").Value;
+            
+
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(databaseConnectionString);
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            CosmosTableService tableService = new CosmosTableService(tableClient, tableName);
+           // CloudTable table =  tableClient.GetTableReference(tableName);
+                        
+            return tableService;
+        }
+
         private static async Task<CosmosDBService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
         {
             string databaseName = configurationSection.GetSection("DatabaseName").Value;

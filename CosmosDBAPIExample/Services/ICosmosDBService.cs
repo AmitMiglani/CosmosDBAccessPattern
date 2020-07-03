@@ -9,8 +9,6 @@ namespace CosmosDBAPIExample.Services
     {
         Task<System.Collections.Generic.IEnumerable<DeviceMetadataTelemetryMessage>> GetDeviceMetadata(QueryDefinition query);
 
-        Task<System.Collections.Generic.IEnumerable<TelemetryDataMessage>> GetDeviceTelemetryData(QueryDefinition query);
-
-        
+        Task<System.Collections.Generic.IEnumerable<TelemetryDataMessage>> GetDeviceTelemetryData(QueryDefinition query);        
     }
 }
